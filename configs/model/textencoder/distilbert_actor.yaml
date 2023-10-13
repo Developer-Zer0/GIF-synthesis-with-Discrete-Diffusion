@@ -1,0 +1,15 @@
+name: distilbert_actor
+_target_: src.models.text_models.distilbert_actor.DistilbertActorAgnosticEncoder
+
+latent_dim: ${model.latent_dim}
+vae: ${model.generator.vae}
+
+ff_size: ${model.ff_size}
+num_layers: ${model.num_layers}
+num_head: ${model.num_head}
+droupout: ${model.droupout}
+activation: ${model.activation}
+
+finetune: false
+#modelpath: ${paths.deps}/distilbert-base-uncased
+modelpath: distilbert-base-uncased

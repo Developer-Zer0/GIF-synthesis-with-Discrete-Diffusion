@@ -1,0 +1,25 @@
+_target_: src.models.text_motion_model.TextMotionModel
+generator:
+  _target_: src.models.networks.seq2seq_net.Seq2SeqNet
+  model_args:
+    hidden_size: 200
+    n_layers: 2
+    dropout_prob: 0.1
+  n_poses: ${datamodule.sampler.request_frames}
+
+losses:
+  _target_: src.models.metrics.loss.ComputeLosses
+  mode: smpl
+  loss_dict:
+    mse_data: 20.0 # mse data loss weight
+    cont_data: 0.1 # motion continuous weight
+  loss_opts:
+    loss_feat_type: rfeats
+    pred_data_type:
+      - t2m_data
+      - m2m_data
+
+lr_args:
+  gen_lr: 0.001
+
+

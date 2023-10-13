@@ -1,0 +1,4 @@
+_target_: src.models.motionencoder.vq_encoder_v3_guo.VQEncoderV3
+
+channels: [1024, 1024]    # 1024 = dim_vq_latent
+n_down: 2

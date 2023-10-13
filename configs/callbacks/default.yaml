@@ -1,0 +1,43 @@
+defaults:
+  - model_checkpoint.yaml
+  - fid_checkpoint.yaml
+  - precision_checkpoint.yaml
+  - early_stopping.yaml
+  - model_summary.yaml
+  #- rich_progress_bar.yaml
+  - _self_
+
+# Best val_loss
+model_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "epoch_{epoch:03d}"
+  monitor: "total/val"
+  mode: "min"
+  save_last: True
+  auto_insert_metric_name: False
+
+# FID checkpoint
+fid_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "fid_best"
+  monitor: "Metrics/fid-val"
+  mode: "min"
+  save_last: True
+  auto_insert_metric_name: True
+
+# r-precision checkpoint
+precision_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "precision_best"
+  monitor: "Metrics/R-precision-Top-3-val"
+  mode: "max"
+  save_last: True
+  auto_insert_metric_name: False
+
+early_stopping:
+  monitor: "total/val"
+  patience: 5000
+  mode: "max"
+
+model_summary:
+  max_depth: -1

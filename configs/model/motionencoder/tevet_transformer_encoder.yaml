@@ -1,0 +1,14 @@
+_target_: src.models.motionencoder.tevet_transformer_encoder.TevetTransformerEncoder
+
+latent_dim: ${model.latent_dim}
+
+ff_size: ${model.ff_size}
+num_layers: ${model.num_layers}
+num_head: ${model.num_head}
+dropout: ${model.droupout}
+activation: ${model.activation}
+
+# Values taken from GuyTevet Kit arguments
+data_rep: 'hml_vec'
+#njoints: 135                                          # 251 in GuyTevet Kit, 135 works for our data
+nfeats: 1

@@ -1,0 +1,59 @@
+# @package _global_
+
+# specify here default configuration
+# order of defaults determines the order in which configs override each other
+defaults:
+  - _self_
+#  - datamodule: kit-amass-rot.yaml
+  - datamodule: humanml.yaml
+  - model: text_motion_model.yaml
+  - callbacks: default.yaml
+  - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
+  - trainer: eval_default.yaml
+  - paths: default.yaml
+  #- /paths/default.yaml@paths
+  - extras: default.yaml
+  - hydra: default.yaml
+
+  # experiment configs allow for version control of specific hyperparameters
+  # e.g. best hyperparameters for given model and datamodule
+  - experiment: null
+
+  # config for hyperparameter optimization
+  - hparams_search: null
+
+  # optional local config for machine/user specific settings
+  # it's optional since it doesn't need to exist and is excluded from version control
+  - optional local: default.yaml
+
+  # debugging config (enable through command line, e.g. `python train.py debug=default)
+  - debug: null
+
+# task name, determines output directory path
+task_name: "eval"
+
+# tags to help you identify your experiments
+# you can overwrite this in experiment configs
+# overwrite from command line with `python train.py tags="[first_tag, second_tag]"`
+# appending lists from command line is currently not supported :(
+# https://github.com/facebookresearch/hydra/issues/1547
+tags: ["dev"]
+
+# set False to skip model training
+train: False
+
+# evaluate on test set, using best model weights achieved during training
+# lightning chooses best weights based on the metric specified in checkpoint callback
+test: True
+
+# simply provide checkpoint path to resume training
+#ckpt_path: #/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-04-27_23-44-30/checkpoints/last.ckpt
+ckpt_path: /home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-05-02_10-18-27/checkpoints/precision_best.ckpt
+
+eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/t2m/text_mot_match/model/finest.tar    # HumanML3D
+#eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/text_mot_match/model/finest.tar     # KIT-ML
+
+batch_size: 32
+
+# seed for random number generators in pytorch, numpy and python.random
+seed: 100

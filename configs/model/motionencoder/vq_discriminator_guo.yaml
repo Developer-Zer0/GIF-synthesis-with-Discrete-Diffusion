@@ -1,0 +1,5 @@
+_target_: src.models.motionencoder.vq_discriminator_guo.VQDiscriminator
+
+input_size:
+hidden_size:
+n_layer:

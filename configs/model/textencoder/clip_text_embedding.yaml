@@ -1,0 +1,12 @@
+_target_: src.models.text_models.clip_text_embedding.CLIPTextEmbedding
+
+# params:
+#   clip_name: 'ViT-B/32'
+#   num_embed: 49408 # 49152+256
+#   normalize: True
+#   pick_last_embedding: False   # if True same as clip but we need embedding of each word
+#   keep_seq_len_dim: False
+#   additional_last_embedding: False
+#   embed_dim: 512
+
+clip_dim: 512

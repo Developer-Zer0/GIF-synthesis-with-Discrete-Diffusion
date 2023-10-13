@@ -1,0 +1,296 @@
+task_name: train
+tags:
+- dev
+train: true
+test: true
+ckpt_path: null
+eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/text_mot_match/model/finest.tar
+batch_size: 128
+seed: null
+datamodule:
+  transforms:
+    rots2rfeats:
+      name: SMPLVelP
+      _target_: src.datamodules.datasets.transforms.rots2rfeats.SMPLVelP
+      pose_rep: rot6d
+      path: ${paths.deps}/transforms/rots2rfeats/smplvelp/${.pose_rep}/${datamodule.dataname}
+      canonicalize: true
+      normalization: ${datamodule.transforms.normalization}
+    rots2joints:
+      name: SMPLH
+      _target_: src.datamodules.datasets.transforms.rots2joints.SMPLH
+      jointstype: mmm
+      input_pose_rep: matrix
+      path: ${paths.smpl_path}
+      batch_size: 256
+      gender: neutral
+    joints2jfeats:
+      name: Rifke
+      _target_: src.datamodules.datasets.transforms.joints2jfeats.Rifke
+      path: ${paths.deps}/transforms/joints2jfeats/rifke/${datamodule.dataname}
+      normalization: ${datamodule.transforms.normalization}
+      forward_filter: false
+    name: HumanMLSMPLTransform
+    ename: smpl
+    _target_: src.datamodules.datasets.transforms.HumanMLSMPLTransform
+    normalization: false
+    joints_num: ${datamodule.joints_num}
+  sampler:
+    _target_: src.datamodules.datasets.sampling.FrameSampler
+    request_frames: 40
+    threshold_reject: 0.75
+    sampling: conseq
+    sampling_step: 1
+    max_len: 10000
+    min_len: 10
+  dataname: kit-ml
+  _target_: src.datamodules.humanml_datamodule.HumanMLDataModule
+  datapath: ${paths.datasets}/Guo-KIT-ML/KIT-ML
+  splitpath: ${paths.datasets}/Guo-KIT-ML/KIT-ML
+  batch_size: ${batch_size}
+  num_workers: 0
+  framerate: 12.5
+  joints_num: 21
+  dim_pose: 251
+  max_motion_length: 196
+  feat_bias: 20
+  tiny: false
+  progress_bar: true
+  collate_fn: ${model.collate_fn}
+  deps: ${paths.deps}
+  devices: ${trainer.devices}
+model:
+  generator:
+    textencoder:
+      _target_: src.models.text_models.clip_text_embedding.CLIPTextEmbedding
+      clip_dim: 512
+    diffusion_model:
+      transformer:
+        dalle:
+          _target_: src.models.motionencoder.dalle_mask_image_embedding.DalleMaskImageEmbedding
+          num_embed: 1023
+          embed_dim: 64
+          trainable: true
+          pos_emb_type: embedding
+        _target_: src.models.motionencoder.transformer_utils.Text2ImageTransformer
+        attn_type: selfcross
+        n_layer: 19
+        condition_seq_len: 77
+        content_seq_len: 49
+        content_spatial_size:
+        - 32
+        - 32
+        n_embd: 64
+        condition_dim: 512
+        n_head: 16
+        attn_pdrop: 0.0
+        resid_pdrop: 0.0
+        block_activate: GELU2
+        timestep_type: adalayernorm
+        mlp_hidden_times: 4
+      _target_: src.models.motionencoder.diffusion_transformer.DiffusionTransformer
+      diffusion_step: 100
+      alpha_init_type: alpha1
+      auxiliary_loss_weight: 0.0005
+      adaptive_auxiliary_loss: true
+      mask_weight:
+      - 1
+      - 1
+      content_seq_len: 49
+      learnable_cf: false
+      guidance_scale: 1.1
+    _target_: src.models.networks.vq_diffusion.VQDiffusion
+    transforms: ${datamodule.transforms}
+  autoencoder:
+    encoder:
+      _target_: src.models.motionencoder.vq_encoder_v3_guo.VQEncoderV3
+      channels:
+      - 1024
+      - 1024
+      n_down: 2
+    decoder:
+      _target_: src.models.motiondecoder.vq_decoder_v3_guo.VQDecoderV3
+      input_size: 1024
+      channels:
+      - 1024
+      - 1024
+      n_resblk: 3
+      n_up: 2
+    quantizer:
+      _target_: src.models.motionencoder.quantizer_guo.Quantizer
+      n_e: 1024
+      e_dim: 1024
+      beta: 1
+    _target_: src.models.networks.vq_vae_guo.VQVAEGuo
+    transforms: ${datamodule.transforms}
+    checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/TM2T/checkpoints/kit/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
+  length_estimator:
+    textencoder:
+      _target_: src.models.text_models.len_estimator_guo.MotionLenEstimatorBiGRU
+      word_size: 300
+      pos_size: 15
+      hidden_size: 512
+      num_classes: 50
+    _target_: src.models.networks.guo_len_est.GuoLenEst
+    checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/length_est_bigru/model/latest.tar
+  evaluator:
+    motionencoder:
+      textencoder:
+        _target_: src.models.text_models.text_encoder_bi_gru_co.TextEncoderBiGRUCo
+        hidden_size: 512
+        word_size: 300
+        pos_size: 15
+        output_size: 512
+      motion_encoder:
+        _target_: src.models.motionencoder.motion_encoder_bi_gru_co.MotionEncoderBiGRUCo
+        input_size: 512
+        hidden_size: 1024
+        output_size: 512
+      _target_: src.models.networks.guo_text_motion_matching.GuoTextMotionMatching
+      transforms: ${datamodule.transforms}
+      vae: true
+    autoencoder:
+      motionencoder:
+        name: conv_motion_snip_encoder
+        _target_: src.models.motionencoder.conv_motion_snip_encoder.ConvMotionSnipEncoder
+        latent_size: 512
+        vae: true
+        hidden_size: 512
+        droupout: 0.2
+        activation: LeakyReLU
+      motiondecoder:
+        name: conv_snip_motion_decoder
+        _target_: src.models.motiondecoder.conv_snip_motion_decoder.ConvSnipMotionDecoder
+        latent_size: 512
+        vae: true
+        hidden_size: 384
+        droupout: 0.2
+        activation: LeakyReLU
+      _target_: src.models.networks.guo_autoencoder.GuoAutoEncoder
+      transforms: ${datamodule.transforms}
+      vae: true
+      autoencoder_hidden_size: 384
+      autoencoder_latent_size: 512
+      droupout: 0.2
+      activation: LeakyReLU
+    _target_: src.utils.evaluator.Evaluator
+    checkpoint_paths: ${eval_ckpt}
+    diversity_times: 30
+  _target_: src.models.multistage_text_motion_model.MultistageTextMotionModel
+  generator_losses:
+    _target_: src.models.metrics.loss.ComputeLosses
+    mode: smpl
+    loss_dict:
+      l_dummy: 1.0
+    loss_opts:
+      loss_feat_type: rfeats
+  freeze_models_dict:
+    generator: []
+    autoencoder:
+    - encoder
+    - decoder
+    - quant_conv
+    - post_quant_conv
+    - bottleneck_quantize
+    length_estimator: []
+  checkpoint_paths:
+    autoencoder: /home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-05-10_15-24-43/checkpoints/fid_best.ckpt
+  lr_args:
+    gen_lr: 0.006
+    auto_lr: 0.0
+    len_est_lr: 0
+  collate_fn: collate_datastruct_and_text
+  do_evaluation: true
+  devices: ${trainer.devices}
+callbacks:
+  model_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: epoch_{epoch:03d}
+    monitor: total/val
+    verbose: false
+    save_last: true
+    save_top_k: 1
+    mode: min
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  fid_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: fid_best
+    monitor: Metrics/fid-val
+    verbose: false
+    save_last: true
+    save_top_k: 1
+    mode: min
+    auto_insert_metric_name: true
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  precision_checkpoint:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: ${paths.output_dir}/checkpoints
+    filename: precision_best
+    monitor: Metrics/R-precision-Top-3-val
+    verbose: false
+    save_last: true
+    save_top_k: 1
+    mode: max
+    auto_insert_metric_name: false
+    save_weights_only: false
+    every_n_train_steps: null
+    train_time_interval: null
+    every_n_epochs: null
+    save_on_train_epoch_end: null
+  early_stopping:
+    _target_: pytorch_lightning.callbacks.EarlyStopping
+    monitor: total/val
+    min_delta: 0.0
+    patience: 5000
+    verbose: false
+    mode: max
+    strict: true
+    check_finite: true
+    stopping_threshold: null
+    divergence_threshold: null
+    check_on_train_epoch_end: null
+  model_summary:
+    _target_: pytorch_lightning.callbacks.RichModelSummary
+    max_depth: -1
+logger:
+  tensorboard:
+    _target_: pytorch_lightning.loggers.tensorboard.TensorBoardLogger
+    save_dir: ${paths.output_dir}/tensorboard/
+    name: null
+    log_graph: false
+    default_hp_metric: true
+    prefix: ''
+trainer:
+  _target_: pytorch_lightning.Trainer
+  default_root_dir: ${paths.output_dir}
+  min_epochs: 1
+  max_epochs: 2000
+  accelerator: ddp
+  gpus: 2
+  devices:
+  - 0
+  - 1
+  deterministic: false
+paths:
+  root_dir: ${oc.env:PROJECT_ROOT}
+  log_dir: ${paths.root_dir}/logs/
+  output_dir: ${hydra:runtime.output_dir}
+  work_dir: ${hydra:runtime.cwd}
+  datasets: /data/feng/Gestures
+  deps: ${paths.datasets}/Deps/TextMotionDeps
+  smpl_path: ${paths.datasets}/SMPL_Data/models/smplh
+extras:
+  ignore_warnings: false
+  enforce_tags: true
+  print_config: true

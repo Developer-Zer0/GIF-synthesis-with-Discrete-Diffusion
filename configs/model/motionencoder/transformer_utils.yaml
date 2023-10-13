@@ -1,0 +1,18 @@
+_target_: src.models.motionencoder.transformer_utils.Text2ImageTransformer
+
+attn_type: 'selfcross'
+n_layer: 19
+condition_seq_len: 77    ###### 77 for clip and 256 for dalle
+content_seq_len: 49  # Chnaged from 10
+content_spatial_size: [32, 32]  ## Check this
+n_embd: 64 # the dim of embedding dims
+condition_dim: 512
+n_head: 16 
+attn_pdrop: 0.0
+resid_pdrop: 0.0
+block_activate: GELU2
+timestep_type: 'adalayernorm'    # adainsnorm or adalayernorm and abs
+mlp_hidden_times: 4
+
+defaults:
+  - /model/motionencoder/dalle_mask_image_embedding@dalle

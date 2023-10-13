@@ -1,0 +1,6 @@
+_target_: src.models.text_models.text_encoder_bi_gru_co.TextEncoderBiGRUCo
+
+hidden_size: 512
+word_size: 300
+pos_size: 15
+output_size: 512
