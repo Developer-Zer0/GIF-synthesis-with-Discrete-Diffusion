@@ -1,4 +1,4 @@
-## COnditional GIF Synthesis
+## Conditional GIF Synthesis
 
 Generating GIFs based on text descriptions, start frame or end frame.
 
