@@ -68,7 +68,7 @@ class VideoDataset(data.Dataset):
 
         class_name = get_parent_dir(self._clips.video_paths[idx])
         label = self.class_to_label[class_name]
-        return dict(video=preprocess(video, resolution), label=label, length=len(video), orig_length=orig_length)
+        return dict(video=preprocess(video, resolution), label=label, length=len(video), orig_length=orig_length, text=class_name)
 
 
 def get_parent_dir(path):
