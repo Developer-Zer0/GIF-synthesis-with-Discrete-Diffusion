@@ -55,7 +55,7 @@ class VQVAE(pl.LightningModule):
         h = self.post_vq_conv(shift_dim(h, -1, 1))
         return self.decoder(h)
 
-    def forward(self, x):
+    def forward(self, x, do_inference=False):
         z = self.pre_vq_conv(self.encoder(x))
         # print('z', z.shape)
         vq_output = self.codebook(z)
