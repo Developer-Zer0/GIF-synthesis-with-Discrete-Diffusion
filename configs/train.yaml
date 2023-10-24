@@ -5,7 +5,7 @@
 defaults:
   - _self_
 #  - datamodule: kit-amass-rot.yaml
-  - datamodule: guo-kit-ml.yaml
+  - datamodule: ufc101.yaml
   - model: text_motion_model.yaml
   - callbacks: default.yaml
   - logger: null # set logger here or use command line (e.g. `python train.py logger=tensorboard`)
@@ -50,9 +50,9 @@ test: True
 ckpt_path: null
 
 #eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/t2m/text_mot_match/model/finest.tar    # HumanML3D
-eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/text_mot_match/model/finest.tar     # KIT-ML
+# eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/text_mot_match/model/finest.tar     # KIT-ML
 
-batch_size: 16
+batch_size: 32
 
 # seed for random number generators in pytorch, numpy and python.random
 seed: null
