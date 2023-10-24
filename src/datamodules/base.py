@@ -1,7 +1,7 @@
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
-class BaseTextMotionDataModule(pl.LightningDataModule):
+class BaseTextVideoDataModule(pl.LightningDataModule):
     def __init__(self, collate_fn, batch_size: int,
                  num_workers: int,
                  ):
