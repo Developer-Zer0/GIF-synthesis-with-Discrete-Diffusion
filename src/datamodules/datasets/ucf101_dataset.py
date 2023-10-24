@@ -21,7 +21,7 @@ class VideoDataset(data.Dataset):
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
 
-    def __init__(self, data_folder, sequence_length, train=True, resolution=64):
+    def __init__(self, data_folder, sequence_length, split="train", resolution=64):
         """
         Args:
             data_folder: path to the folder with videos. The folder
@@ -30,11 +30,11 @@ class VideoDataset(data.Dataset):
             sequence_length: length of extracted video sequences
         """
         super().__init__()
-        self.train = train
+        self.split = split
         self.sequence_length = sequence_length
         self.resolution = resolution
 
-        folder = osp.join(data_folder, 'train' if train else 'test')
+        folder = osp.join(data_folder, split)
         files = sum([glob.glob(osp.join(folder, '**', f'*.{ext}'), recursive=True)
                      for ext in self.exts], [])
 
