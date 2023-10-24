@@ -2,9 +2,15 @@ _target_: src.models.text_motion_model.TextMotionModel
 
 generator:
   _target_: src.models.networks.videogpt_vq_vae.VQVAE
-
   checkpoint_path: /home/ICT2000/achemburkar/Downloads/t2mt/t2m/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
 #  checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/TM2T/checkpoints/kit/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
+  embedding_dim: 64
+  n_codes: 2048
+  n_hiddens: 240
+  n_res_layers: 4
+  downsample: [4, 4, 4]
+  sequence_length: ${datamodule.sequence_length}
+  resolution: ${datamodule.resolution}
 
 losses:
   _target_: src.models.metrics.loss.ComputeLosses
