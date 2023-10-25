@@ -27,7 +27,7 @@ lr_args:
 
 do_evaluation: false
 
-collate_fn: ufc101_collate
+collate_fn: ucf101_collate
 
 devices: ${trainer.devices}
 

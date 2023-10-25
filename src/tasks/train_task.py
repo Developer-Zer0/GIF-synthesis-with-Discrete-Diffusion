@@ -35,7 +35,7 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 
     log.info(f"Instantiating model <{cfg.model._target_}>")
     # we don't recursively instantiate the model so we have more room to customize it
-    model: LightningModule = hydra.utils.instantiate(cfg.model, nfeats=datamodule.nfeats, _recursive_=False)
+    model: LightningModule = hydra.utils.instantiate(cfg.model, _recursive_=False)
 
     log.info("Instantiating callbacks...")
     callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))

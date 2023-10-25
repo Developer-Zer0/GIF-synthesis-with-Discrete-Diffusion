@@ -8,7 +8,7 @@ from src.models.base import BaseModel
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
-from src.models.metrics.metrics import ComputeMetrics
+# from src.models.metrics.metrics import ComputeMetrics
 import random
 
 from src.utils.basic_video_renderer import render_animation
@@ -18,7 +18,7 @@ if os.name != "nt":
 
 import torch
 
-from src.utils.evaluator import Evaluator
+# from src.utils.evaluator import Evaluator
 
 class TextMotionModel(BaseModel):
     """
@@ -68,7 +68,7 @@ class TextMotionModel(BaseModel):
             {split: instantiate(losses,_recursive_ = False)
              for split in ["losses_train", "losses_test", "losses_val"]})
         self.losses = {key: self._losses["losses_" + key] for key in ["train", "test", "val"]}
-        self.metrics = ComputeMetrics()
+        # self.metrics = ComputeMetrics()
         self.lr_args = lr_args
         self.render_animations = render_animations
 
@@ -127,7 +127,7 @@ class TextMotionModel(BaseModel):
         dico.update({"epoch": float(self.trainer.current_epoch),
                      "step": float(self.trainer.current_epoch)})
 
-        if split == 'val' and self.current_epoch % 10 == 0:
+        if split == 'val' and self.current_epoch % 5 == 0:
             self.render_sample_results()
 
         self.log_dict(dico)
@@ -166,10 +166,10 @@ class TextMotionModel(BaseModel):
         inference_output = self.sample_generator_step(sample_data_batch)
         
         output_video_file = os.path.join(output_dir, 'epoch%d_synthesis.mp4' % self.current_epoch)
-        render_animation(inference_output['pred_data'], output_path = output_video_file, fps=5)
+        render_animation(inference_output['pred_data'][0].permute(1, 2, 3, 0).cpu().numpy(), output_path = output_video_file, fps=1)
 
         output_video_file = os.path.join(output_dir, 'epoch%d_original.mp4' % self.current_epoch)
-        render_animation(inference_output['gt_data'], output_path = output_video_file, fps=5)
+        render_animation(inference_output['gt_data'][0].permute(1, 2, 3, 0).cpu().numpy(), output_path = output_video_file, fps=1)
 
         self.generator.train()
 

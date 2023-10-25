@@ -21,7 +21,7 @@ class VideoDataset(data.Dataset):
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
 
-    def __init__(self, data_folder, sequence_length, split="train", resolution=64):
+    def __init__(self, data_folder, sequence_length, split="train", resolution=64, **kwargs):
         """
         Args:
             data_folder: path to the folder with videos. The folder
@@ -46,11 +46,11 @@ class VideoDataset(data.Dataset):
         warnings.filterwarnings('ignore')
         cache_file = osp.join(folder, f"metadata_{sequence_length}.pkl")
         if not osp.exists(cache_file):
-            clips = VideoClips(files, sequence_length, num_workers=32)
+            clips = VideoClips(files, sequence_length, 100, num_workers=32)
             pickle.dump(clips.metadata, open(cache_file, 'wb'))
         else:
             metadata = pickle.load(open(cache_file, 'rb'))
-            clips = VideoClips(files, sequence_length,
+            clips = VideoClips(files, sequence_length, 100,
                                _precomputed_metadata=metadata)
         self._clips = clips
 
@@ -103,4 +103,4 @@ def preprocess(video, resolution, sequence_length=None):
 
     video -= 0.5
 
-    return video
+    return torch.tensor(video, device=device)

@@ -85,7 +85,7 @@ def compute_contrastive_loss(output1, output2, label):
 # GuyTevet Diffusion
 def compute_dummy(output, loss_opts):
     try:
-        return torch.mean(output['losses']['loss'])  # Total loss taken and mean over batch dimension
+        return torch.mean(output['losses']['commitment_loss'] + output['losses']['recon_loss'])  # Total loss taken and mean over batch dimension
     except IndexError:
         return torch.mean(output['losses'])
 

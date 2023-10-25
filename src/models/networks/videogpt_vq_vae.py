@@ -12,7 +12,8 @@ from src.models.utils.model_utils import MultiHeadAttention
 from src.models.utils.model_utils import shift_dim
 
 class VQVAE(pl.LightningModule):
-    def __init__(self, embedding_dim, n_codes, n_hiddens, n_res_layers, downsample, sequence_length, resolution):
+    def __init__(self, checkpoint_path, embedding_dim, n_codes, n_hiddens, 
+                n_res_layers, downsample, sequence_length, resolution, **kwargs):
         super().__init__()
         # self.args = args
         # self.embedding_dim = 64
@@ -35,6 +36,8 @@ class VQVAE(pl.LightningModule):
         self.codebook = Codebook(self.n_codes, self.embedding_dim)
         self.save_hyperparameters()
 
+        # self.device = device
+
     @property
     def latent_shape(self):
         input_shape = (self.sequence_length, self.resolution,
@@ -55,7 +58,9 @@ class VQVAE(pl.LightningModule):
         h = self.post_vq_conv(shift_dim(h, -1, 1))
         return self.decoder(h)
 
-    def forward(self, x, do_inference=False):
+    def forward(self, batch, do_inference=False):
+        x = batch['video']
+        x = x.to(self.device)
         z = self.pre_vq_conv(self.encoder(x))
         # print('z', z.shape)
         vq_output = self.codebook(z)

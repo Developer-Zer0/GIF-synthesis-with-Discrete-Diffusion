@@ -9,6 +9,9 @@ class UCF101DataModule(BaseTextVideoDataModule):
                  num_workers: int = 16,
                  **kwargs):
 
+        from .datasets.data_utils import ucf101_collate
+        self.collate_fn = ucf101_collate
+        
         super().__init__(collate_fn=self.collate_fn,
                          batch_size=batch_size,
                          num_workers=num_workers,

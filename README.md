@@ -21,10 +21,11 @@ pip install -r requirements.txt
 Values for MODEL-CONFIG can be:
 
 ```list
+videogpt_vq_vae.yaml
 vq_diffusion.yaml
 ```
 ```bash
- python src/train.py --config-name=train model=MODEL-CONFIG model.do-evaluations=false trainer.devices=[1] trainer.max_epochs=500
+ python src/train.py --config-name=train model=MODEL-CONFIG model.do_evaluation=false trainer.devices=[1] trainer.max_epochs=500 logger=tensorboard
  ```
 ## Dataset
 Training and testing on the TumblrGIF (TGIF) dataset. Create folder named "TGIF" in the same directory as the repo. The folder should have the following files/folders:

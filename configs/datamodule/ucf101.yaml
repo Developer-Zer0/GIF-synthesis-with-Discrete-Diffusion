@@ -2,8 +2,8 @@ dataname: ufc101
 _target_: src.datamodules.ucf101_datamodule.UCF101DataModule
 
 data_folder: ${paths.datasets}/UCF101
-sequence_length: 16
-resolution: 128
+sequence_length: 8
+resolution: 64
 # splitpath: ${paths.datasets}/UCF101
 
 # Machine
@@ -18,6 +18,6 @@ progress_bar: true
 collate_fn: ${model.collate_fn}
 
 # Word_vectorizer etc.
-deps: ${paths.deps}
+# deps: ${paths.deps}
 
 devices: ${trainer.devices}
