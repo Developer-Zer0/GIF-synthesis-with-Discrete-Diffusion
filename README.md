@@ -22,14 +22,10 @@ Values for MODEL-CONFIG can be:
 
 ```list
 videogpt_vq_vae.yaml
-vq_diffusion.yaml
+discrete_diffusion.yaml
 ```
 ```bash
-<<<<<<< HEAD
  python src/train.py --config-name=train model=MODEL-CONFIG model.do_evaluation=false trainer.devices=[1] trainer.max_epochs=500 logger=tensorboard
-=======
- python src/train.py --config-name=train model=MODEL-CONFIG model.do_evaluations=false trainer.devices=[1] trainer.max_epochs=500 logger=tensorboard
->>>>>>> e8ec1d4c4353c36a5715c6dcafc4e7f9ebbba654
  ```
 ## Dataset
 Training and testing on the TumblrGIF (TGIF) dataset. Create folder named "TGIF" in the same directory as the repo. The folder should have the following files/folders:

@@ -1,0 +1,70 @@
+_target_: src.models.multistage_text_motion_model.MultistageTextMotionModel
+generator:
+  _target_: src.models.networks.discrete_diffusion.DiscreteDiffusion
+
+autoencoder:
+  _target_: src.models.networks.videogpt_vq_vae.VQVAE
+  checkpoint_path: __None__
+#  checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/TM2T/checkpoints/kit/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
+  embedding_dim: 64
+  n_codes: 2048
+  n_hiddens: 240
+  n_res_layers: 4
+  downsample: [4, 4, 4]
+  sequence_length: ${datamodule.sequence_length}
+  resolution: ${datamodule.resolution}
+
+# length_estimator:
+#   _target_: src.models.networks.guo_len_est.GuoLenEst
+#   checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/t2m/length_est_bigru/model/latest.tar
+#  checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/length_est_bigru/model/latest.tar
+
+# evaluator:
+#   _target_: src.utils.evaluator.Evaluator
+
+generator_losses:
+  _target_: src.models.metrics.loss.ComputeLosses
+  mode: smpl
+  loss_dict:
+    l_dummy: 1.0
+  loss_opts:
+    loss_feat_type: rfeats
+
+#autoencoder_losses:
+#  _target_: src.models.metrics.loss.ComputeLosses
+#  mode: smpl
+#  loss_dict:
+#    l_dummy: 1.0
+#  loss_opts:
+#    loss_feat_type: rfeats
+
+freeze_models_dict:
+  generator: []
+  autoencoder: [encoder, decoder, pre_vq_conv, post_vq_conv, codebook]
+  length_estimator: []
+
+checkpoint_paths:
+  autoencoder: /home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-05-10_15-24-43/checkpoints/fid_best.ckpt
+
+lr_args:
+  gen_lr: 4e-4
+  auto_lr: 0.00000
+  len_est_lr: 0
+
+collate_fn: ucf101_collate
+
+do_evaluation: false
+
+devices: ${trainer.devices}
+
+defaults:
+  - /model/textencoder/clip_text_embedding@generator.textencoder
+  - /model/motionencoder/diffusion_transformer@generator.diffusion_model
+#  - /model/motionencoder/resnet1d@autoencoder.encoder
+#  - /model/motiondecoder/resnet1d@autoencoder.decoder
+  # - /model/motionencoder/vq_encoder_v3_guo@autoencoder.encoder
+  # - /model/motiondecoder/vq_decoder_v3_guo@autoencoder.decoder
+  # - /model/motionencoder/quantizer_guo@autoencoder.quantizer
+  # - /model/textencoder/len_estimator_guo@length_estimator.textencoder
+
+  # - /model/evaluator@evaluator

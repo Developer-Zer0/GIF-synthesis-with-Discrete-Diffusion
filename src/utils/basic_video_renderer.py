@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import imageio
 from matplotlib.animation import FuncAnimation
 
-def render_animation(frames, output_path, fps=5):
+def render_animation(frames, output_path, fps=5, text=None):
   frames += 0.5
   fig = plt.figure()
   def update_img(n):
