@@ -241,7 +241,7 @@ class MultistageTextMotionModel(BaseModel):
             total_dico.update({f"Metrics/{metric}-{split}": value for metric, value in metrics.items()})
             self.evaluator.reset()
 
-        if split == 'val' and self.current_epoch % 5 == 0:
+        if split == 'val' and self.current_epoch % 1 == 0:
             self.render_sample_results()
 
         self.log_dict(total_dico)

@@ -2,8 +2,8 @@ _target_: src.models.motionencoder.dalle_mask_image_embedding.DalleMaskImageEmbe
 
 # diffusion_step: 100
 
-num_embed: 2048 #or 2047?
-# spatial_size: [32, 32]
+num_embed: 4096 #or 2047?
+spatial_size: [48, 48]
 embed_dim: 64
 trainable: true
 pos_emb_type: embedding

@@ -6,11 +6,11 @@ autoencoder:
   _target_: src.models.networks.videogpt_vq_vae.VQVAE
   checkpoint_path: __None__
 #  checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/TM2T/checkpoints/kit/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
-  embedding_dim: 64
-  n_codes: 2048
-  n_hiddens: 240
+  embedding_dim: 128
+  n_codes: 4096
+  n_hiddens: 256
   n_res_layers: 4
-  downsample: [4, 4, 4]
+  downsample: [2, 8, 8]
   sequence_length: ${datamodule.sequence_length}
   resolution: ${datamodule.resolution}
 
@@ -44,10 +44,10 @@ freeze_models_dict:
   length_estimator: []
 
 checkpoint_paths:
-  autoencoder: /home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-05-10_15-24-43/checkpoints/fid_best.ckpt
+  autoencoder: /home1/chemburk/GIF-synthesis-with-Discrete-Diffusion/logs/train/runs/2023-10-29_21-15-27/checkpoints/last.ckpt
 
 lr_args:
-  gen_lr: 4e-4
+  gen_lr: 1e-4
   auto_lr: 0.00000
   len_est_lr: 0
 

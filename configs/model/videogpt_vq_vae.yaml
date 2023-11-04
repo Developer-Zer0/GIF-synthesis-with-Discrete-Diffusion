@@ -4,11 +4,11 @@ generator:
   _target_: src.models.networks.videogpt_vq_vae.VQVAE
   checkpoint_path: /home/ICT2000/achemburkar/Downloads/t2mt/t2m/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
 #  checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/TM2T/checkpoints/kit/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
-  embedding_dim: 64
+  embedding_dim: 512
   n_codes: 2048
-  n_hiddens: 240
-  n_res_layers: 4
-  downsample: [4, 4, 4]
+  n_hiddens: 256
+  n_res_layers: 3
+  downsample: [2, 16, 16]
   sequence_length: ${datamodule.sequence_length}
   resolution: ${datamodule.resolution}
 
@@ -21,7 +21,7 @@ losses:
     loss_feat_type: rfeats
 
 lr_args:
-  gen_lr: 1e-5
+  gen_lr: 4e-4
 
 #checkpoint_paths: /home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-03-08_13-44-20/checkpoints/last.ckpt
 

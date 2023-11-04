@@ -20,6 +20,12 @@ class VideoDataset(data.Dataset):
     """ Generic dataset for videos files stored in folders
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
+    class_names = ['FrisbeeCatch','Swing','Mixing','SkateBoarding','CricketBowling','Punch','BreastStroke','Rowing',
+    'CuttingInKitchen','PlayingFlute','FloorGymnastics','BoxingPunchingBag','IceDancing','TaiChi','Nunchucks','ThrowDiscus',
+    'BenchPress','Biking','BalanceBeam','BodyWeightSquats','ApplyEyeMakeup','BaseballPitch','HighJump','Typing','JugglingBalls',]
+    #'SalsaSpin','VolleyballSpiking','PlayingCello','SumoWrestling','BrushingTeeth','Skijet','PlayingTabla','Hammering','Archery',
+    #'HorseRiding','LongJump','MilitaryParade','BasketballDunk','ApplyLipstick','HammerThrow','Fencing','RockClimbingIndoor',
+    #'Knitting','HeadMassage','PoleVault','CricketShot','HorseRace','PushUps','StillRings','Billiards','BlowingCandles']
 
     def __init__(self, data_folder, sequence_length, split="train", resolution=64, **kwargs):
         """
@@ -37,6 +43,8 @@ class VideoDataset(data.Dataset):
         folder = osp.join(data_folder, split)
         files = sum([glob.glob(osp.join(folder, '**', f'*.{ext}'), recursive=True)
                      for ext in self.exts], [])
+
+        files = [f for f in files if get_parent_dir(f) in self.class_names]
 
         # hacky way to compute # of classes (count # of unique parent directories)
         self.classes = list(set([get_parent_dir(f) for f in files]))

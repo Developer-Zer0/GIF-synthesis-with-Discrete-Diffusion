@@ -5,7 +5,7 @@ alpha_init_type: 'alpha1'       # init_type = fix or cos or linear
 auxiliary_loss_weight: 5.0e-4
 adaptive_auxiliary_loss: True
 mask_weight: [1, 1]    # the loss weight on mask region and non-mask region
-content_seq_len: 512   # 2*16*16
+content_seq_len: 2048   # 2*16*16
 
 learnable_cf: False
 guidance_scale: 4
