@@ -1,37 +1,14 @@
 # _target_: src.models.text_motion_model.TextMotionModel
 _target_: src.utils.evaluator.Evaluator
-motionencoder:
-  _target_: src.models.networks.guo_text_motion_matching.GuoTextMotionMatching
-  transforms: ${datamodule.transforms}
-  vae: true
-
-autoencoder:
-  _target_: src.models.networks.guo_autoencoder.GuoAutoEncoder
-  transforms: ${datamodule.transforms}
-  vae: true
-  autoencoder_hidden_size: 384
-  autoencoder_latent_size: 512
-  droupout: 0.2
-  activation: "LeakyReLU"
-
-#  vae: true
-#  hidden_size: 384
-#  latent_size: 512
-#  droupout: 0.2
-#  activation: "LeakyReLU"
-#  nfeats: ${datamodule.nfeats}
-
-#freeze_models_dict:
-#  generator: []
-#  autoencoder: [motionencoder]
-#  length_estimator: [textencoder]
+videoencoder:
+  _target_: src.models.motionencoder.pytorch_i3d.InceptionI3d
 
 checkpoint_paths: ${eval_ckpt}
 
-diversity_times: 30
+# diversity_times: 30
 
-defaults:
-  - /model/textencoder/text_encoder_bi_gru_co@motionencoder.textencoder
-  - /model/motionencoder/motion_encoder_bi_gru_co@motionencoder.motion_encoder
-  - /model/motionencoder/conv_motion_snip_encoder@autoencoder.motionencoder
-  - /model/motiondecoder/conv_snip_motion_decoder@autoencoder.motiondecoder
+# defaults:
+#   - /model/textencoder/text_encoder_bi_gru_co@motionencoder.textencoder
+#   - /model/motionencoder/motion_encoder_bi_gru_co@motionencoder.motion_encoder
+#   - /model/motionencoder/conv_motion_snip_encoder@autoencoder.motionencoder
+#   - /model/motiondecoder/conv_snip_motion_decoder@autoencoder.motiondecoder

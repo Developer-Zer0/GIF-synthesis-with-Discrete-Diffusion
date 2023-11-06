@@ -17,13 +17,13 @@ model_checkpoint:
   auto_insert_metric_name: False
 
 # FID checkpoint
-# fid_checkpoint:
-#   dirpath: ${paths.output_dir}/checkpoints
-#   filename: "fid_best"
-#   monitor: "Metrics/fid-val"
-#   mode: "min"
-#   save_last: True
-#   auto_insert_metric_name: True
+fid_checkpoint:
+  dirpath: ${paths.output_dir}/checkpoints
+  filename: "fvd_best"
+  monitor: "Metrics/fvd-val"
+  mode: "min"
+  save_last: True
+  auto_insert_metric_name: True
 
 # r-precision checkpoint
 # precision_checkpoint:

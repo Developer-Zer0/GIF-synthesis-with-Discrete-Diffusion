@@ -5,6 +5,7 @@ from matplotlib.animation import FuncAnimation
 
 def render_animation(frames, output_path, fps=5, text=None):
   frames += 0.5
+  frames = (frames * 255).astype('uint8')
   fig = plt.figure()
   def update_img(n):
       plt.imshow(frames[n])

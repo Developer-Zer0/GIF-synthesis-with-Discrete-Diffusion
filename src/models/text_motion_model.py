@@ -33,7 +33,7 @@ class TextMotionModel(BaseModel):
         losses: DictConfig,
         # nfeats: int,
         # checkpoint_paths: dict,  # Dict of checkpoint paths for either autoencoder or length_estimator or generator
-        # evaluator: DictConfig = None,
+        evaluator: DictConfig = None,
         lr_args = {},
         render_animations: bool = True,
         do_evaluation: bool = False,
@@ -74,7 +74,7 @@ class TextMotionModel(BaseModel):
 
         self.do_evaluation = do_evaluation
         if self.do_evaluation:
-            self.evaluator = instantiate(evaluator, nfeats=nfeats, device=self.gpu_device, _recursive_=False)
+            self.evaluator = instantiate(evaluator, device=self.gpu_device, _recursive_=False)
 
     def generator_step(self, batch: Any):
         generator_outputs = self.generator(batch)

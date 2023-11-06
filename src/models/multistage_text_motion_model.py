@@ -44,7 +44,7 @@ class MultistageTextMotionModel(BaseModel):
         checkpoint_paths: dict,                # Dict of checkpoint paths for either autoencoder or length_estimator or generator
         # nfeats: int,
         # losses: dict,                         # Use this for the onitialize_losses function
-        # evaluator: DictConfig = None,
+        evaluator: DictConfig = None,
         generator_losses: DictConfig = None,
         autoencoder_losses: DictConfig = None,
         length_estimator_losses: DictConfig = None,
@@ -118,7 +118,7 @@ class MultistageTextMotionModel(BaseModel):
 
         self.do_evaluation = do_evaluation
         if self.do_evaluation:
-            self.evaluator = instantiate(evaluator, nfeats=nfeats, device=self.gpu_device, _recursive_=False)
+            self.evaluator = instantiate(evaluator, device=self.gpu_device, _recursive_=False)
 
     def load_checkpoints(self, checkpoint_paths):
         for key, module in zip(self.keys, self.modules):

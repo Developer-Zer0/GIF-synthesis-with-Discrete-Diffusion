@@ -53,7 +53,7 @@ lr_args:
 
 collate_fn: ucf101_collate
 
-do_evaluation: false
+do_evaluation: true
 
 devices: ${trainer.devices}
 
@@ -67,4 +67,4 @@ defaults:
   # - /model/motionencoder/quantizer_guo@autoencoder.quantizer
   # - /model/textencoder/len_estimator_guo@length_estimator.textencoder
 
-  # - /model/evaluator@evaluator
+  - /model/evaluator@evaluator

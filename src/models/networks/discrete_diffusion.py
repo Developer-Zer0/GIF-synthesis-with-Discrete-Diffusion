@@ -20,7 +20,6 @@ class DiscreteDiffusion(nn.Module):
         x = batch['video'].to(autoencoder.device)
         quant = autoencoder.encode(x)
         quant_flat = quant.view(x.shape[0], -1)
-        print('==================================1', quant_flat.shape)
 
         text_emb = self.textencoder(batch['text'])
         text_emb = text_emb.unsqueeze(1)
@@ -38,7 +37,6 @@ class DiscreteDiffusion(nn.Module):
         diffusion_out = self.diffusion_model(diffusion_input, return_loss=True)
 
         single_step_out = autoencoder.decode(diffusion_out['pred_data'].view(quant.shape))
-        print('==================================2', single_step_out.shape)
 
         if do_inference:
 

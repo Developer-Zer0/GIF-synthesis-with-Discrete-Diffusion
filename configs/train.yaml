@@ -51,6 +51,7 @@ ckpt_path: null
 
 #eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/t2m/text_mot_match/model/finest.tar    # HumanML3D
 # eval_ckpt: /home/ICT2000/achemburkar/Desktop/repos/text-to-motion/checkpoints/kit/text_mot_match/model/finest.tar     # KIT-ML
+eval_ckpt: /home1/chemburk/pretrained/i3d_pretrained_400.pt
 
 batch_size: 32
 

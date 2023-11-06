@@ -53,7 +53,7 @@ class VideoDataset(data.Dataset):
 
         warnings.filterwarnings('ignore')
         cache_file = osp.join(folder, f"metadata_{sequence_length}.pkl")
-        if not osp.exists(cache_file):
+        if not osp.exists(cache_file) or True:
             clips = VideoClips(files, sequence_length, 100, num_workers=32)
             pickle.dump(clips.metadata, open(cache_file, 'wb'))
         else:
@@ -111,4 +111,4 @@ def preprocess(video, resolution, sequence_length=None):
 
     video -= 0.5
 
-    return torch.tensor(video, device=device)
+    return video
