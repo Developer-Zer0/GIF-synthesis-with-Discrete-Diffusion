@@ -32,7 +32,7 @@ class TextMotionModel(BaseModel):
         generator: DictConfig,
         losses: DictConfig,
         # nfeats: int,
-        # checkpoint_paths: dict,  # Dict of checkpoint paths for either autoencoder or length_estimator or generator
+        checkpoint_paths: dict,  # Dict of checkpoint paths for either autoencoder or length_estimator or generator
         evaluator: DictConfig = None,
         lr_args = {},
         render_animations: bool = True,
@@ -100,7 +100,7 @@ class TextMotionModel(BaseModel):
 
         if self.do_evaluation and (split != 'train' and len(batch['length']) != 1):
             eval_outputs = self.sample_generator_step(batch)
-            self.evaluator.push_vals(batch, batch_idx, eval_outputs['pred_data'].features)
+            self.evaluator.push_vals(batch, batch_idx, eval_outputs['pred_data'])
             # self.evaluator.push_vals(batch, batch_idx, outputs['pred_data'].features)
 
         compute_loss = self.losses[split]

@@ -8,7 +8,7 @@ mask_weight: [1, 1]    # the loss weight on mask region and non-mask region
 content_seq_len: 2048   # 2*16*16
 
 learnable_cf: False
-guidance_scale: 4
+guidance_scale: 2
 
 defaults:
   - /model/motionencoder/transformer_utils@transformer

@@ -23,7 +23,7 @@ losses:
 lr_args:
   gen_lr: 4e-4
 
-#checkpoint_paths: /home/ICT2000/achemburkar/Desktop/TextMotionGenerator/logs/train/runs/2023-03-08_13-44-20/checkpoints/last.ckpt
+checkpoint_paths: /home1/chemburk/GIF-synthesis-with-Discrete-Diffusion/logs/train/runs/2023-11-05_18-03-47/checkpoints/last.ckpt
 
 do_evaluation: true
 

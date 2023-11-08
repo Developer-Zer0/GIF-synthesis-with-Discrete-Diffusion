@@ -185,9 +185,9 @@ class MultistageTextMotionModel(BaseModel):
         prefix = '%s/'%split
         outputs = self.generator_step(batch)
 
-        if self.do_evaluation and (split != 'train' and len(batch['length']) != 1):
+        if self.do_evaluation and (split != 'train' and len(batch['length']) != 1) and self.current_epoch % 20 == 0:
             eval_outputs = self.sample_generator_step(batch)
-            self.evaluator.push_vals(batch, batch_idx, eval_outputs['pred_data'].features)
+            self.evaluator.push_vals(batch, batch_idx, eval_outputs['pred_data'])
             # self.evaluator.push_vals(batch, batch_idx, batch['datastruct'].features)
 
         new_keys = [k + '_loss' for k in self.keys]
@@ -235,13 +235,13 @@ class MultistageTextMotionModel(BaseModel):
                 total_dico.update(dico)
                 total_dico[s] += dico[s]
 
-        if self.do_evaluation and (split != 'train'):
+        if self.do_evaluation and (split != 'train') and self.current_epoch % 20 == 0:
             metrics = self.evaluator.evaluate_metrics(self.trainer.datamodule, self.generator)
             # print(metrics)
             total_dico.update({f"Metrics/{metric}-{split}": value for metric, value in metrics.items()})
             self.evaluator.reset()
 
-        if split == 'val' and self.current_epoch % 1 == 0:
+        if split == 'val' and self.current_epoch % 20 == 0:
             self.render_sample_results()
 
         self.log_dict(total_dico)

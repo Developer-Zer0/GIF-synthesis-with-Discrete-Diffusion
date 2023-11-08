@@ -1,9 +1,11 @@
 import torch
 import torch.nn as nn
-from src.models.metrics.metrics import *
+# from src.models.metrics.metrics import *
 from hydra.utils import instantiate
 from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
+from src.datamodules.datasets.ucf101_dataset import preprocess
+import numpy as np
 
 class Evaluator:
     def __init__(self, device, videoencoder, checkpoint_paths):
@@ -24,6 +26,7 @@ class Evaluator:
         checkpoint = torch.load(checkpoint_paths,
                                 map_location=self.device)
         self.videoencoder.load_state_dict(checkpoint)
+        self.videoencoder.to(device)
 
     def reset(self):
         self.all_video_embeds_gt = []
@@ -36,8 +39,20 @@ class Evaluator:
         self.top_k_count = 0
 
     def push_vals(self, batch, batch_idx, outputs):
-        self.push_generated_outputs(outputs.to(self.device))
-        self.push_gt(batch['datastruct'].features.to(self.device))
+        target_resolution = 224
+
+        gt_data = batch['video'].clone().permute(0, 2, 3, 4, 1).cpu().numpy()
+        gt_data = (gt_data * 255).astype('uint8')
+        gt_data = torch.from_numpy(gt_data)
+        gt_data = torch.stack([preprocess(gt, target_resolution) for gt in gt_data]) * 2
+
+        pred_data = outputs.clone().permute(0, 2, 3, 4, 1).cpu().numpy()
+        pred_data = (pred_data * 255).astype('uint8')
+        pred_data = torch.from_numpy(pred_data)
+        pred_data = torch.stack([preprocess(pred, target_resolution) for pred in pred_data]) * 2
+
+        self.push_generated_outputs(pred_data.to(self.device))
+        self.push_gt(gt_data.to(self.device))
         # self.push_text(batch)
         # self.update_r_precision()
         # self.update_multimodality(batch, batch_idx, generator)
@@ -84,6 +99,12 @@ class Evaluator:
         return fvd
 
 
+# https://github.com/tensorflow/gan/blob/de4b8da3853058ea380a6152bd3bd454013bf619/tensorflow_gan/python/eval/classifier_metrics.py#L161
+def _symmetric_matrix_square_root(mat, eps=1e-10):
+    u, s, v = torch.svd(mat)
+    si = torch.where(s < eps, s, torch.sqrt(s))
+    return torch.matmul(torch.matmul(u, torch.diag(si)), v.t())
+
 # https://github.com/tensorflow/gan/blob/de4b8da3853058ea380a6152bd3bd454013bf619/tensorflow_gan/python/eval/classifier_metrics.py#L400
 def trace_sqrt_product(sigma, sigma_v):
     sqrt_sigma = _symmetric_matrix_square_root(sigma)
@@ -125,6 +146,8 @@ def cov(m, rowvar=False):
 
 
 def frechet_distance(x1, x2):
+    x1 = torch.from_numpy(x1)
+    x2 = torch.from_numpy(x2)
     x1 = x1.flatten(start_dim=1)
     x2 = x2.flatten(start_dim=1)
     m, m_w = x1.mean(dim=0), x2.mean(dim=0)

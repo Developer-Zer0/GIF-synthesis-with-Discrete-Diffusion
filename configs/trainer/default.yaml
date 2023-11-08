@@ -6,8 +6,8 @@ min_epochs: 1 # prevents early stopping
 max_epochs: 10
 
 accelerator: ddp
-gpus: 2
-devices: [0, 1]
+gpus: 1
+devices: [0]
 
 #strategy: ddp_spawn
 #num_nodes: 1
