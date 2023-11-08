@@ -51,7 +51,7 @@ lr_args:
   auto_lr: 0.000001
   len_est_lr: 0
 
-collate_fn: ucf101_collate
+collate_fn: ${datamodule.collate_fn}
 
 do_evaluation: true
 

@@ -22,3 +22,13 @@ def ucf101_collate(lst_elements):
         "text": [x["text"] for x in lst_elements],
     }
     return batch
+
+def msrvtt_collate(lst_elements):
+    batch = {
+        "length": [x["length"] for x in lst_elements],
+        "orig_length": [x["orig_length"] for x in lst_elements],
+        "video": collate_tensors([x["video"] for x in lst_elements]),
+        "label": [x["label"] for x in lst_elements],
+        "text": [x["text"] for x in lst_elements],
+    }
+    return batch

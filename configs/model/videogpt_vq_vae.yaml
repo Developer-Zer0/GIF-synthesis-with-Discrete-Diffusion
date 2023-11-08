@@ -27,7 +27,7 @@ checkpoint_paths: /home1/chemburk/GIF-synthesis-with-Discrete-Diffusion/logs/tra
 
 do_evaluation: true
 
-collate_fn: ucf101_collate
+collate_fn: ${datamodule.collate_fn}
 
 devices: ${trainer.devices}
 

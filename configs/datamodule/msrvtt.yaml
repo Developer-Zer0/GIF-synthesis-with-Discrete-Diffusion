@@ -1,7 +1,7 @@
-dataname: ufc101
-_target_: src.datamodules.ucf101_datamodule.UCF101DataModule
+dataname: msrvtt
+_target_: src.datamodules.msrvtt_datamodule.MSRVTTDataModule
 
-data_folder: ${paths.datasets}/UCF101
+data_folder: ${paths.datasets}/MSRVTT
 sequence_length: 16
 resolution: 128
 # splitpath: ${paths.datasets}/UCF101
@@ -15,7 +15,7 @@ tiny: false
 progress_bar: true
 
 # Collate_fn
-collate_fn: ucf101_collate
+collate_fn: msrvtt_collate
 
 # Word_vectorizer etc.
 # deps: ${paths.deps}
