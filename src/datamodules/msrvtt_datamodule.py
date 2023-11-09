@@ -10,7 +10,7 @@ class MSRVTTDataModule(BaseTextVideoDataModule):
                  **kwargs):
 
         from .datasets.data_utils import msrvtt_collate
-        self.collate_fn = ucf101_collate
+        self.collate_fn = msrvtt_collate
         
         super().__init__(collate_fn=self.collate_fn,
                          batch_size=batch_size,

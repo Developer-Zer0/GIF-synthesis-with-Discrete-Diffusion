@@ -21,12 +21,6 @@ class VideoDataset(data.Dataset):
     """ Generic dataset for videos files stored in folders
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
-    class_names = ['FrisbeeCatch','Swing','Mixing','SkateBoarding','CricketBowling','Punch','BreastStroke','Rowing',
-    'CuttingInKitchen','PlayingFlute','FloorGymnastics','BoxingPunchingBag','IceDancing','TaiChi','Nunchucks','ThrowDiscus',
-    'BenchPress','Biking','BalanceBeam','BodyWeightSquats','ApplyEyeMakeup','BaseballPitch','HighJump','Typing','JugglingBalls',]
-    #'SalsaSpin','VolleyballSpiking','PlayingCello','SumoWrestling','BrushingTeeth','Skijet','PlayingTabla','Hammering','Archery',
-    #'HorseRiding','LongJump','MilitaryParade','BasketballDunk','ApplyLipstick','HammerThrow','Fencing','RockClimbingIndoor',
-    #'Knitting','HeadMassage','PoleVault','CricketShot','HorseRace','PushUps','StillRings','Billiards','BlowingCandles']
 
     def __init__(self, data_folder, sequence_length, split="train", resolution=64, **kwargs):
         """
@@ -52,11 +46,14 @@ class VideoDataset(data.Dataset):
 
         self.video_id_to_sentence = {}
         videos_split_list = []
-        annotations = open(osp.join(data_folder, annon_file))
+        annotations = open(osp.join(data_folder, "train_val_annotation", annon_file))
         a = json.load(annotations)
         sent_list = a['sentences']
         for sent in sent_list:
-            self.video_id_to_sentence[sent['video_id']] = sent['caption']
+            try:
+                self.video_id_to_sentence[sent['video_id']].append(sent['caption'])
+            except KeyError:
+                self.video_id_to_sentence[sent['video_id']] = [sent['caption']]
         vid_list = a['videos']
         for vid in vid_list:
             if split == vid['split']:
@@ -66,7 +63,7 @@ class VideoDataset(data.Dataset):
         warnings.filterwarnings('ignore')
         cache_file = osp.join(osp.join(data_folder, split_folder), f"metadata_{sequence_length}.pkl")
         if not osp.exists(cache_file):
-            clips = VideoClips(videos_split_list, sequence_length, 100, num_workers=32)
+            clips = VideoClips(videos_split_list[:len(videos_split_list)//2], sequence_length, 100, num_workers=32)
             pickle.dump(clips.metadata, open(cache_file, 'wb'))
         else:
             metadata = pickle.load(open(cache_file, 'rb'))
@@ -82,7 +79,9 @@ class VideoDataset(data.Dataset):
         video, _, _, idx = self._clips.get_clip(idx)
         orig_length = video.shape[0]
 
-        text = self.video_id_to_sentence[self._clips.video_paths[idx].split('/')[-1].replace(".mp4", "")]
+        sent_list = self.video_id_to_sentence[self._clips.video_paths[idx].split('/')[-1].replace(".mp4", "")]
+        rand = random.randint(0, len(sent_list)-1)
+        text = sent_list[rand]
         return dict(video=preprocess(video, resolution), label=None, length=len(video), orig_length=orig_length, text=text)
 
 
