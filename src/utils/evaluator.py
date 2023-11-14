@@ -42,14 +42,32 @@ class Evaluator:
         target_resolution = 224
 
         gt_data = batch['video'].clone().permute(0, 2, 3, 4, 1).cpu().numpy()
+
+        mean = [0.485, 0.456, 0.406]
+        std = [0.229, 0.224, 0.225]
+        gt_data = gt_data * std + mean
+
         gt_data = (gt_data * 255).astype('uint8')
         gt_data = torch.from_numpy(gt_data)
         gt_data = torch.stack([preprocess(gt, target_resolution) for gt in gt_data]) * 2
+        if gt_data.shape[2] == 8:
+            gt_data = torch.repeat_interleave(gt_data, 2, dim=2)
+        elif gt_data.shape[2] == 4:
+            gt_data = torch.repeat_interleave(gt_data, 4, dim=2)
 
         pred_data = outputs.clone().permute(0, 2, 3, 4, 1).cpu().numpy()
+
+        mean = [0.485, 0.456, 0.406]
+        std = [0.229, 0.224, 0.225]
+        pred_data = pred_data * std + mean
+
         pred_data = (pred_data * 255).astype('uint8')
         pred_data = torch.from_numpy(pred_data)
         pred_data = torch.stack([preprocess(pred, target_resolution) for pred in pred_data]) * 2
+        if pred_data.shape[2] == 8:
+            pred_data = torch.repeat_interleave(pred_data, 2, dim=2)
+        elif gt_data.shape[2] == 4:
+            pred_data = torch.repeat_interleave(pred_data, 4, dim=2)
 
         self.push_generated_outputs(pred_data.to(self.device))
         self.push_gt(gt_data.to(self.device))

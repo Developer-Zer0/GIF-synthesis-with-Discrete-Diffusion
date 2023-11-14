@@ -127,7 +127,7 @@ class TextMotionModel(BaseModel):
         dico.update({"epoch": float(self.trainer.current_epoch),
                      "step": float(self.trainer.current_epoch)})
 
-        if split == 'val' and self.current_epoch % 2 == 0:
+        if split == 'val' and self.current_epoch % 5 == 0:
             self.render_sample_results()
 
         self.log_dict(dico)

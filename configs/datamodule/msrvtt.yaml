@@ -2,7 +2,7 @@ dataname: msrvtt
 _target_: src.datamodules.msrvtt_datamodule.MSRVTTDataModule
 
 data_folder: ${paths.datasets}/MSRVTT
-sequence_length: 16
+sequence_length: 4
 resolution: 128
 # splitpath: ${paths.datasets}/UCF101
 

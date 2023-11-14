@@ -21,6 +21,12 @@ class VideoDataset(data.Dataset):
     """ Generic dataset for videos files stored in folders
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
+    class_names = ['FrisbeeCatch','Swing','Mixing','SkateBoarding','CricketBowling','Punch','BreastStroke','Rowing',
+    'CuttingInKitchen','PlayingFlute','FloorGymnastics','BoxingPunchingBag','IceDancing','TaiChi','Nunchucks','ThrowDiscus',
+    'BenchPress','Biking','BalanceBeam','BodyWeightSquats','ApplyEyeMakeup','BaseballPitch','HighJump','Typing','JugglingBalls',]
+    #'SalsaSpin','VolleyballSpiking','PlayingCello','SumoWrestling','BrushingTeeth','Skijet','PlayingTabla','Hammering','Archery',
+    #'HorseRiding','LongJump','MilitaryParade','BasketballDunk','ApplyLipstick','HammerThrow','Fencing','RockClimbingIndoor',
+    #'Knitting','HeadMassage','PoleVault','CricketShot','HorseRace','PushUps','StillRings','Billiards','BlowingCandles']
 
     def __init__(self, data_folder, sequence_length, split="train", resolution=64, **kwargs):
         """
@@ -62,8 +68,8 @@ class VideoDataset(data.Dataset):
 
         warnings.filterwarnings('ignore')
         cache_file = osp.join(osp.join(data_folder, split_folder), f"metadata_{sequence_length}.pkl")
-        if not osp.exists(cache_file):
-            clips = VideoClips(videos_split_list[:len(videos_split_list)//2], sequence_length, 100, num_workers=32)
+        if not osp.exists(cache_file) or True:
+            clips = VideoClips(videos_split_list[:len(videos_split_list)//4], sequence_length, 100, num_workers=32)
             pickle.dump(clips.metadata, open(cache_file, 'wb'))
         else:
             metadata = pickle.load(open(cache_file, 'rb'))
@@ -91,7 +97,13 @@ def get_parent_dir(path):
 
 def preprocess(video, resolution, sequence_length=None):
     # video: THWC, {0, ..., 255}
-    video = video.permute(0, 3, 1, 2).float() / 255. # TCHW
+    video = video.float() / 255.
+
+    mean = torch.tensor([0.485, 0.456, 0.406])
+    std = torch.tensor([0.229, 0.224, 0.225])
+    video = (video - mean) / std
+
+    video = video.permute(0, 3, 1, 2) # TCHW
     t, c, h, w = video.shape
 
     # temporal crop
@@ -115,6 +127,6 @@ def preprocess(video, resolution, sequence_length=None):
     video = video[:, :, h_start:h_start + resolution, w_start:w_start + resolution]
     video = video.permute(1, 0, 2, 3).contiguous() # CTHW
 
-    video -= 0.5
+    # video -= 0.5
 
     return video
