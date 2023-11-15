@@ -14,6 +14,7 @@ import torch.utils.data as data
 import torch.nn.functional as F
 import torch.distributed as dist
 from torchvision.datasets.video_utils import VideoClips
+from torchvision.models import resnet50, ResNet50_Weights
 # import pytorch_lightning as pl
 import json
 
@@ -21,12 +22,6 @@ class VideoDataset(data.Dataset):
     """ Generic dataset for videos files stored in folders
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
-    class_names = ['FrisbeeCatch','Swing','Mixing','SkateBoarding','CricketBowling','Punch','BreastStroke','Rowing',
-    'CuttingInKitchen','PlayingFlute','FloorGymnastics','BoxingPunchingBag','IceDancing','TaiChi','Nunchucks','ThrowDiscus',
-    'BenchPress','Biking','BalanceBeam','BodyWeightSquats','ApplyEyeMakeup','BaseballPitch','HighJump','Typing','JugglingBalls',]
-    #'SalsaSpin','VolleyballSpiking','PlayingCello','SumoWrestling','BrushingTeeth','Skijet','PlayingTabla','Hammering','Archery',
-    #'HorseRiding','LongJump','MilitaryParade','BasketballDunk','ApplyLipstick','HammerThrow','Fencing','RockClimbingIndoor',
-    #'Knitting','HeadMassage','PoleVault','CricketShot','HorseRace','PushUps','StillRings','Billiards','BlowingCandles']
 
     def __init__(self, data_folder, sequence_length, split="train", resolution=64, **kwargs):
         """
@@ -40,6 +35,9 @@ class VideoDataset(data.Dataset):
         self.split = split
         self.sequence_length = sequence_length
         self.resolution = resolution
+        self.resnet = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+        weights = ResNet50_Weights.IMAGENET1K_V2
+        self.frame_preprocess = weights.transforms()
 
         if split == 'val':
             split = 'validate'
@@ -88,7 +86,15 @@ class VideoDataset(data.Dataset):
         sent_list = self.video_id_to_sentence[self._clips.video_paths[idx].split('/')[-1].replace(".mp4", "")]
         rand = random.randint(0, len(sent_list)-1)
         text = sent_list[rand]
-        return dict(video=preprocess(video, resolution), label=None, length=len(video), orig_length=orig_length, text=text)
+
+        video = preprocess(video, resolution)
+
+        # Extract frame
+        frame = video.permute(1, 0, 2, 3)[0]
+        processed_frame = self.frame_preprocess(frame)
+        frame_feats = self.resnet(processed_frame)
+
+        return dict(video=video, label=None, length=len(video), orig_length=orig_length, text=text, frame=frame_feats)
 
 
 def get_parent_dir(path):

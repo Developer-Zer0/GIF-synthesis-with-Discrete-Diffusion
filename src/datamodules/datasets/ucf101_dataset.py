@@ -40,6 +40,9 @@ class VideoDataset(data.Dataset):
         self.split = split
         self.sequence_length = sequence_length
         self.resolution = resolution
+        self.resnet = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+        weights = ResNet50_Weights.IMAGENET1K_V2
+        self.frame_preprocess = weights.transforms()
 
         folder = osp.join(data_folder, split)
         files = sum([glob.glob(osp.join(folder, '**', f'*.{ext}'), recursive=True)
@@ -77,7 +80,15 @@ class VideoDataset(data.Dataset):
 
         class_name = get_parent_dir(self._clips.video_paths[idx])
         label = self.class_to_label[class_name]
-        return dict(video=preprocess(video, resolution), label=label, length=len(video), orig_length=orig_length, text=class_name)
+
+        video = preprocess(video, resolution)
+        
+        # Extract frame
+        frame = video.permute(1, 0, 2, 3)[0]
+        processed_frame = self.frame_preprocess(frame)
+        frame_feats = self.resnet(processed_frame)
+
+        return dict(video=video, label=label, length=len(video), orig_length=orig_length, text=class_name, frame=frame_feats)
 
 
 def get_parent_dir(path):
