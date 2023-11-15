@@ -97,7 +97,12 @@ def get_parent_dir(path):
 
 def preprocess(video, resolution, sequence_length=None):
     # video: THWC, {0, ..., 255}
-    video = video.permute(0, 3, 1, 2).float() / 255. # TCHW
+    video = video.float() / 255.
+
+    mean = torch.tensor([0.485, 0.456, 0.406])
+    std = torch.tensor([0.229, 0.224, 0.225])
+    video = (video - mean) / std
+
     t, c, h, w = video.shape
 
     # temporal crop
@@ -121,6 +126,6 @@ def preprocess(video, resolution, sequence_length=None):
     video = video[:, :, h_start:h_start + resolution, w_start:w_start + resolution]
     video = video.permute(1, 0, 2, 3).contiguous() # CTHW
 
-    video -= 0.5
+    # video -= 0.5
 
     return video

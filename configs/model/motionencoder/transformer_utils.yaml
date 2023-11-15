@@ -3,7 +3,7 @@ _target_: src.models.motionencoder.transformer_utils.Text2ImageTransformer
 attn_type: 'selfcross'
 n_layer: 19
 condition_seq_len: 77    ###### 77 for clip and 256 for dalle
-content_seq_len: 2048  # 2*16*16
+content_seq_len: 1024  # 2*16*16
 content_spatial_size: [48, 48]  ## Check this
 n_embd: 64 # the dim of embedding dims
 condition_dim: 512

@@ -74,8 +74,8 @@ class MultistageTextMotionModel(BaseModel):
 
         # self.load_checkpoints(checkpoint_paths)
         
-        # state_dict = torch.load(checkpoint_paths, map_location=self.gpu_device)['state_dict']
-        # self.autoencoder.load_state_dict(state_dict)
+        state_dict = torch.load(checkpoint_paths, map_location=self.gpu_device)['state_dict']
+        self.autoencoder.load_state_dict(state_dict)
 
         ## This function not working for some reason
         # self.losses = self.initialize_losses(losses)
@@ -185,7 +185,7 @@ class MultistageTextMotionModel(BaseModel):
         prefix = '%s/'%split
         outputs = self.generator_step(batch)
 
-        if self.do_evaluation and (split != 'train' and len(batch['length']) != 1) and self.current_epoch % 20 == 0:
+        if self.do_evaluation and (split != 'train' and len(batch['length']) != 1) and self.current_epoch % 5 == 0:
             eval_outputs = self.sample_generator_step(batch)
             self.evaluator.push_vals(batch, batch_idx, eval_outputs['pred_data'])
             # self.evaluator.push_vals(batch, batch_idx, batch['datastruct'].features)
@@ -235,13 +235,13 @@ class MultistageTextMotionModel(BaseModel):
                 total_dico.update(dico)
                 total_dico[s] += dico[s]
 
-        if self.do_evaluation and (split != 'train') and self.current_epoch % 20 == 0:
+        if self.do_evaluation and (split != 'train') and self.current_epoch % 5 == 0:
             metrics = self.evaluator.evaluate_metrics(self.trainer.datamodule, self.generator)
             # print(metrics)
             total_dico.update({f"Metrics/{metric}-{split}": value for metric, value in metrics.items()})
             self.evaluator.reset()
 
-        if split == 'val' and self.current_epoch % 20 == 0:
+        if split == 'val' and self.current_epoch % 10 == 0:
             self.render_sample_results()
 
         self.log_dict(total_dico)
