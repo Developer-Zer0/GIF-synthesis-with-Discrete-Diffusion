@@ -151,7 +151,7 @@ typing_extensions==4.3.0
 urllib3==1.26.11
 virtualenv==20.16.3
 wandb==0.13.0
-wasabi==0.10.1
+wasabi==1.1.2
 wcwidth==0.2.5
 Werkzeug==2.2.1
 yarl==1.8.1
