@@ -1,5 +1,0 @@
-_target_: src.models.motionencoder.quantizer_guo.Quantizer
-
-n_e: 1024   # codebook_size
-e_dim: 1024
-beta: 1

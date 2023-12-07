@@ -13,8 +13,6 @@ class DiscreteDiffusion(nn.Module):
 
         self.device = next(self.parameters()).device
 
-        #self.length_embedder = LengthEmbedder(50, 512)
-
     def forward(self, batch, autoencoder, length_estimator, do_inference=False):
 
         x = batch['video'].to(autoencoder.device)
@@ -23,6 +21,10 @@ class DiscreteDiffusion(nn.Module):
 
         text_emb = self.textencoder(batch['text'])
         text_emb = text_emb.unsqueeze(1)
+
+        text_emb = torch.zeros_like(text_emb, device=autoencoder.device)
+
+        # frame_emb = batch['frame'].to(autoencoder.device)
 
         # len_est = length_estimator.text_encoder_forward(batch["cap_lens"], batch["word_embs"], batch["pos_onehot"])
         # len_emb = self.length_embedder(len_est)
@@ -43,6 +45,10 @@ class DiscreteDiffusion(nn.Module):
             cf_captions = [''] * len(batch['text'])
             cf_text_emb = self.textencoder(cf_captions)
             cf_text_emb = cf_text_emb.unsqueeze(1)
+
+            cf_text_emb = torch.zeros_like(cf_text_emb, device=autoencoder.device)
+
+            # cf_frame_emb = [''] * len(batch['frame'])
 
             inference_out = self.diffusion_model.sample(
                 batch['text'],
@@ -78,28 +84,11 @@ class DiscreteDiffusion(nn.Module):
 
     def get_motion_embeddings(self, autoencoder, features):
         # quant = autoencoder.encode_feature(features)
-        poses = torch.transpose(features, 1, 2)
-        quant, diff, metrics = autoencoder.encode(poses)
-        # datastruct_test = self.transforms.Datastruct(features=test)
+        video = torch.transpose(features, 1, 2)
+        quant, diff, metrics = autoencoder.encode(video)
         return quant
 
     def get_text_embeddings(self, features):
         text_emb = self.textencoder(features)
         text_emb = text_emb.unsqueeze(1)
         return text_emb
-
-
-# Very simple Linear implementation. can refer to tevet_transformer_encoder later to improve
-# class LengthEmbedder(nn.Module):
-#     def __init__(self, latent_dim, len_embed_dim):
-#         super().__init__()
-
-#         # latent_dim = 50, len_embed_dim = 512
-#         self.len_embed = nn.Sequential(
-#             nn.Linear(latent_dim, len_embed_dim),
-#             nn.SiLU(),
-#             nn.Linear(len_embed_dim, len_embed_dim),
-#         )
-
-#     def forward(self, length):
-#         return self.len_embed(length)

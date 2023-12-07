@@ -15,10 +15,7 @@ class VQVAE(pl.LightningModule):
     def __init__(self, checkpoint_path, embedding_dim, n_codes, n_hiddens, 
                 n_res_layers, downsample, sequence_length, resolution, **kwargs):
         super().__init__()
-        # self.args = args
-        # self.embedding_dim = 64
         self.embedding_dim = embedding_dim
-        # self.n_codes = 2048
         self.n_codes = n_codes
 
         self.n_hiddens = n_hiddens
@@ -62,12 +59,8 @@ class VQVAE(pl.LightningModule):
         x = batch['video']
         x = x.to(self.device)
         z = self.pre_vq_conv(self.encoder(x))
-        # print('z', z.shape)
         vq_output = self.codebook(z)
-        # print('vq_output', vq_output.keys())
         x_recon = self.decoder(self.post_vq_conv(vq_output['embeddings']))
-        # print('x_recon', x_recon.shape)
-        # print('========================')
         recon_loss = F.mse_loss(x_recon, x) / 0.06
 
         model_out = {
@@ -183,15 +176,11 @@ class Codebook(nn.Module):
         if self._need_init and self.training:
             self._init_embeddings(z)
         flat_inputs = shift_dim(z, 1, -1).flatten(end_dim=-2)
-        # print(flat_inputs.shape)
-        # print(self.embeddings.t().shape)
         distances = (flat_inputs ** 2).sum(dim=1, keepdim=True) \
                     - 2 * flat_inputs @ self.embeddings.t() \
                     + (self.embeddings.t() ** 2).sum(dim=0, keepdim=True)
 
-        # print(distances.shape)
         encoding_indices = torch.argmin(distances, dim=1)
-        # print(encoding_indices.shape)
         encode_onehot = F.one_hot(encoding_indices, self.n_codes).type_as(flat_inputs)
         encoding_indices = encoding_indices.view(z.shape[0], *z.shape[2:])
 

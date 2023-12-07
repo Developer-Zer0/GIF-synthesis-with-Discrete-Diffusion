@@ -12,4 +12,4 @@
 module load gcc/11.3.0
 module load ffmpeg/5.0.1
 
-python src/train.py --config-name=train model=discrete_diffusion.yaml model.do_evaluation=true datamodule=ucf101.yaml trainer.devices=[0,1] trainer.max_epochs=500 logger=tensorboard batch_size=16 model.autoencoder.embedding_dim=256 model.autoencoder.n_codes=2048 model.autoencoder.n_hiddens=240 model.autoencoder.n_res_layers=4 model.autoencoder.downsample=[4,4,4] model.checkpoint_paths="/home1/chemburk/pretrained/ucf101_stride4x4x4"
+python src/train.py --config-name=train model=discrete_diffusion.yaml model.do_evaluation=true datamodule=ucf101.yaml trainer.devices=[0,1] trainer.max_epochs=2000 logger=tensorboard batch_size=16 model.autoencoder.embedding_dim=128 model.autoencoder.n_codes=4096 model.autoencoder.n_hiddens=256 model.autoencoder.n_res_layers=3 model.autoencoder.downsample=[1,8,8] model.generator.diffusion_model.diffusion_step=100 model.generator.diffusion_model.guidance_scale=2 model.generator.diffusion_model.learnable_cf=false model.generator.diffusion_model.transformer.content_spatial_size=[32,32] model.generator.diffusion_model.transformer.dalle.spatial_size=[32,32]

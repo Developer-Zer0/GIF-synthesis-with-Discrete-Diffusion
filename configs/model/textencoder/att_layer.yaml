@@ -1,6 +1,0 @@
-name: att_layer
-_target_: src.models.text_models.bi_gru_guo.AttLayer
-
-query_dim: 1024
-key_dim: 1024 
-value_dim: 512

@@ -14,6 +14,7 @@ import torch.nn.functional as F
 import torch.distributed as dist
 from torchvision.datasets.video_utils import VideoClips
 import pytorch_lightning as pl
+from torchvision.models import resnet50, ResNet50_Weights
 
 
 class VideoDataset(data.Dataset):
@@ -21,12 +22,12 @@ class VideoDataset(data.Dataset):
     Returns BCTHW videos in the range [-0.5, 0.5] """
     exts = ['avi', 'mp4', 'webm']
     class_names = ['FrisbeeCatch','Swing','Mixing','SkateBoarding','CricketBowling','Punch','BreastStroke','Rowing',
-    'CuttingInKitchen','PlayingFlute','FloorGymnastics','BoxingPunchingBag',]
-    #'IceDancing','TaiChi','Nunchucks','ThrowDiscus',
-    #'BenchPress','Biking','BalanceBeam','BodyWeightSquats','ApplyEyeMakeup','BaseballPitch','HighJump','Typing','JugglingBalls',]
-    #'SalsaSpin','VolleyballSpiking','PlayingCello','SumoWrestling','BrushingTeeth','Skijet','PlayingTabla','Hammering','Archery',
-    #'HorseRiding','LongJump','MilitaryParade','BasketballDunk','ApplyLipstick','HammerThrow','Fencing','RockClimbingIndoor',
-    #'Knitting','HeadMassage','PoleVault','CricketShot','HorseRace','PushUps','StillRings','Billiards','BlowingCandles']
+    'CuttingInKitchen','PlayingFlute','FloorGymnastics','BoxingPunchingBag',
+    'IceDancing','TaiChi','Nunchucks','ThrowDiscus',
+    'BenchPress','Biking','BalanceBeam','BodyWeightSquats','ApplyEyeMakeup','BaseballPitch','HighJump','Typing','JugglingBalls',
+    'SalsaSpin','VolleyballSpiking','PlayingCello','SumoWrestling','BrushingTeeth','Skijet','PlayingTabla','Hammering','Archery',
+    'HorseRiding','LongJump','MilitaryParade','BasketballDunk','ApplyLipstick','HammerThrow','Fencing','RockClimbingIndoor',
+    'Knitting','HeadMassage','PoleVault','CricketShot','HorseRace','PushUps','StillRings','Billiards','BlowingCandles']
 
     def __init__(self, data_folder, sequence_length, split="train", resolution=64, **kwargs):
         """
@@ -83,10 +84,15 @@ class VideoDataset(data.Dataset):
 
         video = preprocess(video, resolution)
         
-        # Extract frame
+        Extract frame
         frame = video.permute(1, 0, 2, 3)[0]
         processed_frame = self.frame_preprocess(frame)
         frame_feats = self.resnet(processed_frame)
+
+        if video.shape[2] == 8:
+            video = torch.repeat_interleave(video, 2, dim=2)
+        elif video.shape[2] == 4:
+            video = torch.repeat_interleave(video, 4, dim=2)
 
         return dict(video=video, label=label, length=len(video), orig_length=orig_length, text=class_name, frame=frame_feats)
 
@@ -102,6 +108,8 @@ def preprocess(video, resolution, sequence_length=None):
     mean = torch.tensor([0.485, 0.456, 0.406])
     std = torch.tensor([0.229, 0.224, 0.225])
     video = (video - mean) / std
+
+    video = video.permute(0, 3, 1, 2) # TCHW
 
     t, c, h, w = video.shape
 

@@ -29,7 +29,7 @@ def msrvtt_collate(lst_elements):
         "length": [x["length"] for x in lst_elements],
         "orig_length": [x["orig_length"] for x in lst_elements],
         "video": collate_tensors([x["video"] for x in lst_elements]),
-        "frame": collate_tensors([x["frame"] for x in lst_elements]),
+        # "frame": collate_tensors([x["frame"] for x in lst_elements]),
         "label": [x["label"] for x in lst_elements],
         "text": [x["text"] for x in lst_elements],
     }

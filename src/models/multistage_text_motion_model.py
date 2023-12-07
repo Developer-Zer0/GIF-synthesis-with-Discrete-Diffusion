@@ -7,19 +7,12 @@ from src.models.base import BaseModel
 from hydra.utils import instantiate, get_class
 from omegaconf import DictConfig
 
-# from src.models.metrics.metrics import ComputeMetrics
 import random
-
-# from src.utils.joint_map_smplh import smplh_kinematic_tree
-# from src.utils.joint_map_smplh import mmm_kinematic_tree
 from src.utils.basic_video_renderer import render_animation
-# from src.utils.humanml_render_utils import plot_3d_motion
 
 # from src.utils.evaluator import Evaluator
 
 import numpy as np
-
-# from src.datamodules.datasets.transforms.humanml_smpl import recover_from_ric
 
 if os.name != "nt":
     os.environ['PYOPENGL_PLATFORM'] = 'egl'
@@ -39,7 +32,6 @@ class MultistageTextMotionModel(BaseModel):
         self,
         autoencoder: DictConfig,
         generator: DictConfig,
-        # length_estimator: DictConfig,
         freeze_models_dict: dict,              # Dict of model params to be frozen
         checkpoint_paths: dict,                # Dict of checkpoint paths for either autoencoder or length_estimator or generator
         # nfeats: int,
@@ -106,7 +98,6 @@ class MultistageTextMotionModel(BaseModel):
 
         self.losses = (self.generator_losses, self.autoencoder_losses, self.length_estimator_losses)
 
-        # self.metrics = ComputeMetrics()
         self.lr_args = lr_args
         self.render_animations = render_animations
 
@@ -288,124 +279,3 @@ class MultistageTextMotionModel(BaseModel):
         render_animation(inference_output['gt_data'][0].permute(1, 2, 3, 0).cpu().numpy(), output_path = output_video_file, fps=1)
 
         self.generator.train()
-        
-        # joints_np = pred_output['pred_data'].joints.cpu().numpy()[0] # only one batch
-        # text = sample_data_batch['text'][0]
-
-        # try:
-        #     joints_np = inference_output['pred_m2m'].joints.cpu().numpy()[0] # only one batch
-        #     text = 'No Title'
-        # except KeyError:
-        #     joints_np = inference_output['pred_data'].joints.cpu().numpy()[0] # only one batch
-        #     text = sample_data_batch['text'][0]['caption']
-        # og_joints_np = inference_output['gt_data'].joints.cpu().numpy()[0] # only one batch
-
-        # output_video_file = os.path.join(
-        #     output_dir, 'epoch%d_synthesis.mp4' % self.current_epoch
-        #     )  # get subset of audio track
-
-        # if sample_dataset.nfeats == 263:
-        #     dataset_name = 'HumanML3D'
-        # else:
-        #     dataset_name = 'KIT-ML'
-
-        # render_animation(joints_np, title = text, output = output_video_file, dataset_name=dataset_name)
-        # # joints_np = sample_dataset.inv_transform(joints_np)
-        # # plot_3d_motion(joints=joints_np, title=text, save_path=output_video_file, fps=20)
-
-        # og_output_video_file = os.path.join(
-        #     output_dir, 'epoch%d_original.mp4' % self.current_epoch
-        #     )  # get subset of audio track
-
-        # render_animation(og_joints_np, title = text, output = og_output_video_file, dataset_name=dataset_name)
-        # # og_joints_np = sample_dataset.inv_transform(og_joints_np)
-        # # plot_3d_motion(joints=og_joints_np, title=text, save_path=og_output_video_file, fps=20)
-
-        # try:
-        #     inference_joints_np = inference_output['pred_single_step'].joints.cpu().numpy()[0]
-        #     inference_output_video_file = os.path.join(
-        #         output_dir, 'epoch%d_single_step.mp4' % self.current_epoch
-        #     )  # get subset of audio track
-        #     render_animation(inference_joints_np, title=text, output=inference_output_video_file, dataset_name=dataset_name)
-        #     # inference_joints_np = sample_dataset.inv_transform(inference_joints_np)
-        #     # plot_3d_motion(joints=inference_joints_np, title=text, save_path=inference_output_video_file, fps=20)
-        # except KeyError:
-        #     pass
-
-        # test_joints_np = inference_output['datastruct_test'].joints.cpu().numpy()[0]
-        # test_output_video_file = os.path.join(
-        #     output_dir, 'epoch%d_test.mp4' % self.current_epoch
-        # )  # get subset of audio track
-        # render_animation(test_joints_np, title=text, output=test_output_video_file, dataset_name=dataset_name)
-
-        # self.generator.train()
-
-    # def render_test_results(self, features, step, batch):
-    #     # Function for rendering various test images, motions
-
-    #     orig_length = batch['orig_length'][0]
-    #     inference_output = self.trainer.datamodule.test_dataloader().dataset.inv_transform(features)
-
-    #     # t1 = inference_output['pred_data'].features.cpu().numpy()[0]
-    #     # t2 = inference_output['gt_data'].features.cpu().numpy()[0]
-
-    #     # np.save('/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/temp/vqd_%d.npy' % step, t1)
-    #     # np.save('/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/temp/gt_%d.npy' % step, t2)
-    #     # print(t1.shape, t2.shape)
-
-    #     out_npy_filename = '/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/temp/1708/results_gt_%d.npy' % step
-    #     joints = recover_from_ric(inference_output['pred_data'].features[0], 22)
-    #     j0 = joints[0]
-    #     min_cutoff = 0.004
-    #     beta = 0.7
-    #     oe_filter = OneEuroFilter(0, j0, min_cutoff=min_cutoff, beta=beta)
-    #     for i in range(1, len(joints)):
-    #         joints[i] = oe_filter(i, joints[i])
-
-    #     motion = np.transpose(np.expand_dims(joints.cpu().numpy(), 0),
-    #                           [0, 2, 3, 1])
-
-    #     lengths = np.array([196])
-    #     results = {
-    #         'motion': motion,
-    #         'lengths': orig_length,
-    #         'num_samples': 1,
-    #         'num_repetitions': 1
-    #     }
-    #     np.save(out_npy_filename, results)
-
-    #     # out_npy_filename = '/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/97-render/results_gt_%d.npy' % step
-    #     # joints = recover_from_ric(inference_output['gt_data'].features[0], 22)
-    #     # j0 = joints[0]
-    #     # min_cutoff = 0.004
-    #     # beta = 0.7
-    #     # oe_filter = OneEuroFilter(0, j0, min_cutoff=min_cutoff, beta=beta)
-    #     # for i in range(1, len(joints)):
-    #     #     joints[i] = oe_filter(i, joints[i])
-    #     #
-    #     # motion = np.transpose(np.expand_dims(joints.cpu().numpy(), 0),
-    #     #                       [0, 2, 3, 1])
-    #     # lengths = np.array([196])
-    #     # results = {
-    #     #     'motion': motion,
-    #     #     'lengths': lengths,
-    #     #     'num_samples': 1,
-    #     #     'num_repetitions': 1
-    #     # }
-    #     # np.save(out_npy_filename, results)
-
-    #     joints_np = inference_output['pred_data'].joints.cpu().numpy()[0]  # only one batch
-    #     og_joints_np = inference_output['gt_data'].joints.cpu().numpy()[0]
-    #     text = batch['text'][0]['caption']
-    #     # output_video_file = os.path.join(
-    #     #     'temp', 'vq_diffusion_%d.mp4' % step
-    #     # )
-    #     # gt_output_video_file = os.path.join(
-    #     #     'temp', 'gt_%d.mp4' % step
-    #     # )
-
-    #     output_video_file = '/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/temp/1708/vq_diffusion_%d.mp4' % step
-    #     # gt_output_video_file = '/home/ICT2000/achemburkar/Desktop/TextMotionGenerator/temp/1708/gt_%d.mp4' % step
-
-    #     render_animation(joints_np, title=text, output=output_video_file, dataset_name='HumanML3D')
-    #     # render_animation(og_joints_np, title=text, output=gt_output_video_file, dataset_name='HumanML3D')

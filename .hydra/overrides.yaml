@@ -1,6 +1,0 @@
-- model=vq_diffusion.yaml
-- datamodule=guo-kit-ml.yaml
-- model.do_evaluation=true
-- logger=tensorboard
-- trainer.devices=[0,1]
-- trainer.max_epochs=2000

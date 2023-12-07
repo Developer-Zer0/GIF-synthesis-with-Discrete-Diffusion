@@ -14,7 +14,7 @@ import torch.utils.data as data
 import torch.nn.functional as F
 import torch.distributed as dist
 from torchvision.datasets.video_utils import VideoClips
-from torchvision.models import resnet50, ResNet50_Weights
+# from torchvision.models import resnet50, ResNet50_Weights
 # import pytorch_lightning as pl
 import json
 
@@ -35,9 +35,9 @@ class VideoDataset(data.Dataset):
         self.split = split
         self.sequence_length = sequence_length
         self.resolution = resolution
-        self.resnet = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
-        weights = ResNet50_Weights.IMAGENET1K_V2
-        self.frame_preprocess = weights.transforms()
+        # self.resnet = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+        # weights = ResNet50_Weights.IMAGENET1K_V2
+        # self.frame_preprocess = weights.transforms()
 
         if split == 'val':
             split = 'validate'
@@ -90,11 +90,11 @@ class VideoDataset(data.Dataset):
         video = preprocess(video, resolution)
 
         # Extract frame
-        frame = video.permute(1, 0, 2, 3)[0]
-        processed_frame = self.frame_preprocess(frame)
-        frame_feats = self.resnet(processed_frame)
+        # frame = video.permute(1, 0, 2, 3)[0]
+        # processed_frame = self.frame_preprocess(frame)
+        # frame_feats = self.resnet(processed_frame)
 
-        return dict(video=video, label=None, length=len(video), orig_length=orig_length, text=text, frame=frame_feats)
+        return dict(video=video, label=None, length=len(video), orig_length=orig_length, text=text)
 
 
 def get_parent_dir(path):

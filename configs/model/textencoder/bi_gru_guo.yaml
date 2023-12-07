@@ -1,5 +1,0 @@
-_target_: src.models.text_models.bi_gru_guo.TextEncoderBiGRU
-
-hidden_size: 512
-word_size: 300
-pos_size: 15

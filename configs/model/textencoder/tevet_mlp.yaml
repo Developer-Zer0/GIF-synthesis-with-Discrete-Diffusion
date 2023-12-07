@@ -1,5 +1,0 @@
-_target_: src.models.text_models.tevet_mlp.TevetMLP
-
-clip_dim: 512
-latent_dim: 512
-cond_mask_prob: 0.1

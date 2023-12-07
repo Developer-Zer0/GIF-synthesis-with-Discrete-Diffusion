@@ -3,7 +3,6 @@ _target_: src.models.text_motion_model.TextMotionModel
 generator:
   _target_: src.models.networks.videogpt_vq_vae.VQVAE
   checkpoint_path: /home/ICT2000/achemburkar/Downloads/t2mt/t2m/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
-#  checkpoint_path: /home/ICT2000/achemburkar/Desktop/repos/TM2T/checkpoints/kit/VQVAEV3_CB1024_CMT_H1024_NRES3/model/finest.tar
   embedding_dim: 128
   n_codes: 4096
   n_hiddens: 256
@@ -14,11 +13,9 @@ generator:
 
 losses:
   _target_: src.models.metrics.loss.ComputeLosses
-  mode: smpl
+  mode: __None__
   loss_dict:
     l_dummy: 1
-  loss_opts:
-    loss_feat_type: rfeats
 
 lr_args:
   gen_lr: 4e-4
@@ -32,8 +29,4 @@ collate_fn: ${datamodule.collate_fn}
 devices: ${trainer.devices}
 
 defaults:
-#   - /model/motionencoder/vq_encoder_v3_guo@generator.encoder
-#   - /model/motiondecoder/vq_decoder_v3_guo@generator.decoder
-#  - /model/motionencoder/vq_discriminator_guo@generator.discriminator
-  # - /model/motionencoder/quantizer_guo@generator.quantizer
   - /model/evaluator@evaluator

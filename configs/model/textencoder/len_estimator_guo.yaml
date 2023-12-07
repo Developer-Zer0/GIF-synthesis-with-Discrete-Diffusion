@@ -1,6 +1,0 @@
-_target_: src.models.text_models.len_estimator_guo.MotionLenEstimatorBiGRU
-
-word_size: 300
-pos_size: 15
-hidden_size: 512
-num_classes: 50   # 200 // opt.unit_length

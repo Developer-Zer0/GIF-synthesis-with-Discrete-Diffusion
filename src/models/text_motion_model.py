@@ -8,7 +8,6 @@ from src.models.base import BaseModel
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
-# from src.models.metrics.metrics import ComputeMetrics
 import random
 
 from src.utils.basic_video_renderer import render_animation
@@ -31,7 +30,6 @@ class TextMotionModel(BaseModel):
         self,
         generator: DictConfig,
         losses: DictConfig,
-        # nfeats: int,
         checkpoint_paths: dict,  # Dict of checkpoint paths for either autoencoder or length_estimator or generator
         evaluator: DictConfig = None,
         lr_args = {},
@@ -68,7 +66,6 @@ class TextMotionModel(BaseModel):
             {split: instantiate(losses,_recursive_ = False)
              for split in ["losses_train", "losses_test", "losses_val"]})
         self.losses = {key: self._losses["losses_" + key] for key in ["train", "test", "val"]}
-        # self.metrics = ComputeMetrics()
         self.lr_args = lr_args
         self.render_animations = render_animations
 
@@ -172,50 +169,5 @@ class TextMotionModel(BaseModel):
         render_animation(inference_output['gt_data'][0].permute(1, 2, 3, 0).cpu().numpy(), output_path = output_video_file, fps=1)
 
         self.generator.train()
-
-        # if sample_dataset.dataname == "HumanML3D":
-        #     inference_output = sample_dataset.inv_transform(inference_output)
-
-        # try:
-        #     joints_np = inference_output['pred_m2m'].joints.cpu().numpy()[0] # only one batch
-        #     text = 'No Title'
-        # except KeyError:
-        #     joints_np = inference_output['pred_data'].joints.cpu().numpy()[0] # only one batch
-        #     # x_t_joints_np = inference_output['x_t'].joints.cpu().numpy()[0] # only one batch
-        #     # output_of_x_t_joints_np = inference_output['output_of_x_t'].joints.cpu().numpy()[0] # only one batch
-
-        #     text = sample_data_batch['text'][0]['caption']
-        # og_joints_np = inference_output['gt_data'].joints.cpu().numpy()[0] # only one batch
-
-        # output_video_file = os.path.join(
-        #     output_dir, 'epoch%d_synthesis.mp4' % self.current_epoch
-        #     )  # get subset of audio track
-
-        # if sample_dataset.nfeats == 263:
-        #     dataset_name = 'HumanML3D'
-        # else:
-        #     dataset_name = 'KIT-ML'
-
-        # render_animation(joints_np, title = text, output = output_video_file, dataset_name=dataset_name)
-
-        # # output_video_file = os.path.join(
-        # #     output_dir, 'epoch%d_x_t.mp4' % self.current_epoch
-        # #     )  # get subset of audio track
-
-        # # render_animation(x_t_joints_np, title = text, output = output_video_file)
-        
-        # # output_video_file = os.path.join(
-        # #     output_dir, 'epoch%d_output_of_x_t.mp4' % self.current_epoch
-        # #     )  # get subset of audio track
-
-        # # render_animation(output_of_x_t_joints_np, title = text, output = output_video_file)
-
-        # og_output_video_file = os.path.join(
-        #     output_dir, 'epoch%d_original.mp4' % self.current_epoch
-        #     )  # get subset of audio track
-
-        # render_animation(og_joints_np, title = text, output = og_output_video_file, dataset_name=dataset_name)
-
-        # self.generator.train()
 
 

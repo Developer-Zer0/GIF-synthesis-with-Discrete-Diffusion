@@ -10,12 +10,6 @@ class BaseTextVideoDataModule(pl.LightningDataModule):
         # from src.datamodules.datasets.data_utils import collate_datastruct_and_text
         self.dataloader_options = {"batch_size": batch_size, "num_workers": num_workers,
                                    "collate_fn": collate_fn}
-        # need to be overloaded:
-        # - self.Dataset
-        # - self._sample_set => load only a small subset
-        #   There is an helper bellow (get_sample_set)
-        # - self.nfeats
-        # - self.transforms
 
     def get_sample_set(self, overrides={}):
         sample_params = self.hparams.copy()

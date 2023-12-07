@@ -1,6 +1,0 @@
-_target_: src.models.motiondecoder.vq_decoder_v3_guo.VQDecoderV3
-
-input_size: 1024
-channels: [1024, 1024]
-n_resblk: 3
-n_up: 2
