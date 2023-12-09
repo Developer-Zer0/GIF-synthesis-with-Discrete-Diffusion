@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=240GB
+#SBATCH --time=24:00:00
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:a40:2
+#SBATCH --account=ywang234_1137
+
+module load gcc/11.3.0
+module load ffmpeg/5.0.1
+
+python src/train.py --config-name=train model=videogpt_vq_vae.yaml model.do_evaluation=true datamodule=ucf101.yaml trainer.devices=[0,1] trainer.max_epochs=2000 logger=tensorboard batch_size=64 model.generator.n_codes=4096 model.generator.n_res_layers=3 model.generator.downsample=[1,8,8]

@@ -31,7 +31,7 @@ freeze_models_dict:
   length_estimator: []
 
 checkpoint_paths:
-  autoencoder: /home1/chemburk/GIF-synthesis-with-Discrete-Diffusion/logs/train/runs/2023-10-29_21-15-27/checkpoints/last.ckpt
+  autoencoder: /home1/chemburk/pretrained/vqvae_checkpoint.ckpt
 
 lr_args:
   gen_lr: 1e-4
